@@ -1,0 +1,130 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senha     String
+  cpf       String?  @unique
+  telefone  String
+  role      String   @default("CLIENTE") // CLIENTE, ADMIN, ENTREGADOR
+  empresaId Int?
+  empresa   Empresa? @relation(fields: [empresaId], references: [id])
+  enderecos Endereco[]
+  pedidos   Pedido[]
+  avaliacoes Avaliacao[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("usuarios")
+}
+
+model Empresa {
+  id           Int       @id @default(autoincrement())
+  nome         String
+  cnpj         String    @unique
+  email        String
+  imagemUrl    String
+  capaUrl      String?
+  categorias   Json
+  tempoEntrega String
+  frete        Float
+  produtos     Produto[]
+  usuarios     Usuario[] // Admins da empresa
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("empresas")
+}
+
+model Produto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Float
+  imagemUrl   String
+  categoria   String
+  peso        String?
+  quantidade  Int      @default(0) // Estoque
+  empresaId   Int
+  empresa     Empresa  @relation(fields: [empresaId], references: [id])
+  itensPedido ItemPedido[]
+  avaliacoes  Avaliacao[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("produtos")
+}
+
+model Endereco {
+  id          Int     @id @default(autoincrement())
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  estado      String
+  apelido     String?
+  usuarioId   Int
+  usuario     Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("enderecos")
+}
+
+model Pedido {
+  id          Int          @id @default(autoincrement())
+  dataPedido  DateTime     @default(now())
+  status      String       @default("pending") // pending, preparing, delivering, delivered
+  valor       Float
+  usuarioId   Int
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id])
+  itens       ItemPedido[]
+
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id            Int     @id @default(autoincrement())
+  quantidade    Int
+  precoUnitario Float
+  pedidoId      Int
+  pedido        Pedido  @relation(fields: [pedidoId], references: [id])
+  produtoId     Int
+  produto       Produto @relation(fields: [produtoId], references: [id])
+
+  @@map("itens_pedido")
+}
+
+model Avaliacao {
+  id        Int      @id @default(autoincrement())
+  nota      Int
+  comentario String?
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  produtoId Int
+  produto   Produto  @relation(fields: [produtoId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("avaliacoes")
+}
+
+model TipoEmprego {
+  id        Int    @id @default(autoincrement())
+  descricao String
+
+  @@map("tipos_emprego")
+}
+
