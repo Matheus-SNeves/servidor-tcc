@@ -1,7 +1,7 @@
-import express from 'express';
+const express = require('express');
 const cors = require('cors');
-import dotenv from 'dotenv';
-import routes from './src/routes';
+const dotenv = require('dotenv');
+const routes = require('./routes');
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ app.get('/docs', (req, res) => {
 app.use(routes);
 
 // Middleware global de erro
-app.use((err: any, req: any, res: any, next: express.NextFunction) => {
+app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).json({ error: 'Erro interno do servidor', details: err.message });
 });

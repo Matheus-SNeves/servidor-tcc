@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export const validateToken = (req: any, res: any, next: NextFunction) => {
+const validateToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -18,3 +17,5 @@ export const validateToken = (req: any, res: any, next: NextFunction) => {
         return res.status(401).json({ message: "Token inválido ou expirado." });
     }
 };
+
+module.exports = { validateToken };

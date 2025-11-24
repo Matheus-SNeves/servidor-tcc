@@ -1,12 +1,11 @@
-
-import { Router } from 'express';
+const { Router } = require('express');
 const { PrismaClient } = require('@prisma/client');
-import genericController from './utils/genericController';
-import { login } from './controllers/authController';
-import * as EmpresaController from './controllers/empresaController';
-import { createCliente, createAdmin } from './controllers/registerController';
-import { validateToken } from './middlewares/auth';
-import { validateBody, loginSchema, cadastroSchema } from './middlewares/validation';
+const genericController = require('./utils/genericController');
+const { login } = require('./controllers/authController');
+const EmpresaController = require('./controllers/empresaController');
+const { createCliente, createAdmin } = require('./controllers/registerController');
+const { validateToken } = require('./middlewares/auth');
+const { validateBody, loginSchema, cadastroSchema } = require('./middlewares/validation');
 
 const prisma = new PrismaClient();
 const routes = Router();
@@ -18,7 +17,7 @@ const EnderecoController = genericController(prisma.endereco);
 const TipoEmpregoController = genericController(prisma.tipoEmprego);
 
 // Helper para criar rotas CRUD padrão
-const createCRUDRoutes = (path: string, controller: any, middlewares: any[] = []) => {
+const createCRUDRoutes = (path, controller, middlewares = []) => {
     routes.post(path, middlewares, controller.create);
     routes.get(path, middlewares, controller.read);
     routes.get(`${path}/:id`, middlewares, controller.readOne);
@@ -27,7 +26,7 @@ const createCRUDRoutes = (path: string, controller: any, middlewares: any[] = []
 };
 
 // --- ROTAS PÚBLICAS ---
-routes.get('/', (req, res) => res.json({ message: "API Speed Market Online" }));
+routes.get('/', (req, res) => res.json({ message: "API Speed Market Online (JS)" }));
 routes.post('/login', validateBody(loginSchema), login);
 routes.post('/cadastro-cliente', validateBody(cadastroSchema), createCliente);
 routes.post('/cadastro-adm', validateBody(cadastroSchema), createAdmin);
@@ -44,7 +43,7 @@ routes.post('/empresas', [validateToken], EmpresaController.create);
 // --- ROTAS PROTEGIDAS (Requer Token) ---
 
 // Pedidos
-routes.get('/pedidos', validateToken, async (req: any, res) => {
+routes.get('/pedidos', validateToken, async (req, res) => {
     try {
         const pedidos = await prisma.pedido.findMany({
             where: { usuarioId: req.user.id },
@@ -57,7 +56,7 @@ routes.get('/pedidos', validateToken, async (req: any, res) => {
     }
 });
 
-routes.post('/pedidos', validateToken, async (req: any, res) => {
+routes.post('/pedidos', validateToken, async (req, res) => {
     try {
         const { itens, total } = req.body;
         
@@ -71,7 +70,7 @@ routes.post('/pedidos', validateToken, async (req: any, res) => {
                 valor: total,
                 status: 'pending',
                 itens: {
-                    create: itens.map((item: any) => ({
+                    create: itens.map((item) => ({
                         produtoId: Number(item.id.split('-p')[1] || item.id), 
                         quantidade: item.quantity,
                         precoUnitario: item.price
@@ -88,7 +87,7 @@ routes.post('/pedidos', validateToken, async (req: any, res) => {
 });
 
 // Avaliações
-routes.post('/avaliacoes', validateToken, async (req: any, res) => {
+routes.post('/avaliacoes', validateToken, async (req, res) => {
     try {
         const { id_produto, nota, comentario } = req.body;
         const avaliacao = await prisma.avaliacao.create({
@@ -109,4 +108,4 @@ createCRUDRoutes('/enderecos', EnderecoController, [validateToken]);
 createCRUDRoutes('/usuarios', UsuarioController, [validateToken]); 
 createCRUDRoutes('/tipoempregos', TipoEmpregoController, [validateToken]);
 
-export default routes;
+module.exports = routes;

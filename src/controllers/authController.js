@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
 
-export const login = async (req: any, res: any, next: NextFunction) => {
+const login = async (req, res, next) => {
     try {
         const { email, senha } = req.body;
 
@@ -34,3 +33,5 @@ export const login = async (req: any, res: any, next: NextFunction) => {
         next(error);
     }
 };
+
+module.exports = { login };

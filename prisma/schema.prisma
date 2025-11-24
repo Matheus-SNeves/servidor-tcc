@@ -1,5 +1,3 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -40,7 +38,7 @@ model Empresa {
   tempoEntrega String
   frete        Float
   produtos     Produto[]
-  usuarios     Usuario[] // Admins da empresa
+  usuarios     Usuario[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,7 +54,7 @@ model Produto {
   imagemUrl   String
   categoria   String
   peso        String?
-  quantidade  Int      @default(0) // Estoque
+  quantidade  Int      @default(0)
   empresaId   Int
   empresa     Empresa  @relation(fields: [empresaId], references: [id])
   itensPedido ItemPedido[]
@@ -87,7 +85,7 @@ model Endereco {
 model Pedido {
   id          Int          @id @default(autoincrement())
   dataPedido  DateTime     @default(now())
-  status      String       @default("pending") // pending, preparing, delivering, delivered
+  status      String       @default("pending")
   valor       Float
   usuarioId   Int
   usuario     Usuario      @relation(fields: [usuarioId], references: [id])
@@ -127,4 +125,3 @@ model TipoEmprego {
 
   @@map("tipos_emprego")
 }
-

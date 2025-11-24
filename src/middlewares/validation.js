@@ -1,12 +1,11 @@
-import Joi from 'joi';
-import { Request, Response, NextFunction } from 'express';
+const Joi = require('joi');
 
-export const loginSchema = Joi.object({
+const loginSchema = Joi.object({
     email: Joi.string().email().required(),
     senha: Joi.string().required(),
 });
 
-export const cadastroSchema = Joi.object({
+const cadastroSchema = Joi.object({
     nome: Joi.string().required(),
     cpf: Joi.string().pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/).optional(),
     telefone: Joi.string().required(),
@@ -16,7 +15,7 @@ export const cadastroSchema = Joi.object({
     id_tipo_empregado: Joi.number().optional()
 });
 
-export const validateBody = (schema: Joi.ObjectSchema) => (req: any, res: any, next: NextFunction) => {
+const validateBody = (schema) => (req, res, next) => {
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
         const messages = error.details.map((detail) => detail.message);
@@ -24,3 +23,5 @@ export const validateBody = (schema: Joi.ObjectSchema) => (req: any, res: any, n
     }
     next();
 };
+
+module.exports = { loginSchema, cadastroSchema, validateBody };

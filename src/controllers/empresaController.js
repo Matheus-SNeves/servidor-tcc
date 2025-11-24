@@ -1,10 +1,7 @@
-
-import { Request, Response, NextFunction } from 'express';
 const { PrismaClient } = require('@prisma/client');
-
 const prisma = new PrismaClient();
 
-export const read = async (req: any, res: any, next: NextFunction) => {
+const read = async (req, res, next) => {
     try {
         const empresas = await prisma.empresa.findMany({
             include: { produtos: true }
@@ -15,7 +12,7 @@ export const read = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const readOne = async (req: any, res: any, next: NextFunction) => {
+const readOne = async (req, res, next) => {
     try {
         const { id } = req.params;
         const empresa = await prisma.empresa.findUnique({
@@ -33,7 +30,7 @@ export const readOne = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const create = async (req: any, res: any, next: NextFunction) => {
+const create = async (req, res, next) => {
     try {
         const empresa = await prisma.empresa.create({ data: req.body });
         res.status(201).json(empresa);
@@ -42,7 +39,7 @@ export const create = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const update = async (req: any, res: any, next: NextFunction) => {
+const update = async (req, res, next) => {
     try {
         const { id } = req.params;
         const empresa = await prisma.empresa.update({
@@ -55,7 +52,7 @@ export const update = async (req: any, res: any, next: NextFunction) => {
     }
 };
 
-export const remove = async (req: any, res: any, next: NextFunction) => {
+const remove = async (req, res, next) => {
     try {
         const { id } = req.params;
         await prisma.empresa.delete({ where: { id: Number(id) } });
@@ -64,3 +61,5 @@ export const remove = async (req: any, res: any, next: NextFunction) => {
         next(error);
     }
 };
+
+module.exports = { read, readOne, create, update, remove };
